@@ -1,9 +1,20 @@
-TTimers={};{const k=c=>api.broadcastMessage(c,{color:"#ff9d87"}),s=TTimers;let m=1,l=0,f=0,T=0,o=1/0,a;setTickTimeout=(c,i=0)=>{const e=m++,t=l+i;if(s[e]=[c,t,T,0],T?s[T][3]=e:f=e,T=e,t<o&&(o=t),a=!0,!i){try{c()}catch(r){k("TTI: "+r)}clearTickTimeout(e)}return e},clearTickInterval=clearTickTimeout=c=>{const i=s[c];if(i){const e=i[2],t=i[3];e?s[e][3]=t:f=t,t?s[t][2]=e:T=e,delete s[c]}},setTickInterval=(c,i)=>{const e=setTickTimeout(c,i||=1);return s[e][4]=i,e},tick=(c,i)=>{if(i||++l>=o){a=!1;let e=1/0,t=f;for(;t;){const r=s[t];if(r[1]<=l){try{r[0]()}catch(n){k("TT: "+n)}if(r[4]){const n=l+r[4];r[1]=n,n<e&&(e=n)}else clearTickTimeout(t)}else r[1]<e&&(e=r[1]);t=r[3]}o=e,a&&tick(1,!0)}}} /* Props to _frostycaveman (discord) for making setTickTimeout!*/
+TTimers={};{const k=c=>api.broadcastMessage(c,{color:"#ff9d87"}),s=TTimers;let m=1,l=0,f=0,T=0,o=1/0,a;setTickTimeout=(c,i=0)=>{const e=m++,t=l+i;if(s[e]=[c,t,T,0],T?s[T][3]=e:f=e,T=e,t<o&&(o=t),a=!0,!i){try{c()}catch(r){k("TTI: "+r)}clearTickTimeout(e)}return e},clearTickInterval=clearTickTimeout=c=>{const i=s[c];if(i){const e=i[2],t=i[3];e?s[e][3]=t:f=t,t?s[t][2]=e:T=e,delete s[c]}},setTickInterval=(c,i)=>{const e=setTickTimeout(c,i||=1);return s[e][4]=i,e},tick=(c,i)=>{if(i||++l>=o){a=!1;let e=1/0,t=f;for(;t;){const r=s[t];if(r[1]<=l){try{r[0]()}catch(n){k("TT: "+n)}if(r[4]){const n=l+r[4];r[1]=n,n<e&&(e=n)}else clearTickTimeout(t)}else r[1]<e&&(e=r[1]);t=r[3]}o=e,a&&tick(1,!0)}}}function styTxt(l){let n=styTxt;if(n.e||(n.e={c:"color",w:"fontWeight",st:"fontStyle",s:"fontSize",o:"opacity"},n.t=/(\\\<)|<(st|[cworis]) *([^>]+)?>/g),l=="")return[""];const r=[],e=new Map;let t="",c=0;for(let{index:f,0:u,1:a,2:o,3:i}of[...l.matchAll(n.t),{index:l.length}]){if(t+=l.slice(c,f),c=f+(u?.length??0),a){t+="<";continue}if(t&&(r.push(e.size?{str:t,style:Object.fromEntries(e)}:t),t=""),f!=l.length)if(o=="r")e.clear();else if(o=="i"&&i){const s=Object.fromEntries(e);delete s.fontStyle,r.push({icon:i,style:s})}else{let s=n.e[o];i?e.set(s,o=="o"?Number(i):i):e.delete(s)}}return r} /* Props to _frostycaveman (discord) for making setTickTimeout and customized custom text styling!*/
 function actuallyGeneratingTheIsland(nDN,nDN2){
   api.setBlockRect([nDN, -150, 429], [nDN2, -150, 424], "Bedrock");
   api.setBlockRect([nDN, -149, 429], [nDN2, -147, 424], "Dirt");
   api.setBlockRect([nDN, -146, 429], [nDN2, -146, 424], "Grass Block");
   api.setBlockRect([nDN - 3, -150, 426], [nDN2, -146, 424], "Air");
+}
+function shop(id,item,price){
+let coins = Number(api.getMoonstoneChestItemSlot(id, 0).attributes.customDisplayName);
+if(coins >= price){
+api.setMoonstoneChestItemSlot(id, 0, "Gold Coin",1,{customDisplayName: String(coins - price)});
+api.giveItem(id, item);
+api.sendMessage(id, `You bought ${item} for $${price}`, {color: "green"});
+api.setClientOptions(id, {RightInfoText:styTxt(`<w bold><s 20px>✨SkyBloxd🌎🌳\n <w><s><c gray><i wrench><c> Owner - BloxdMasterYT_LT5 \n <c yellow><i coins><c> Coins - $${api.getMoonstoneChestItemSlot(id, 0).attributes.customDisplayName}`)});
+}else{
+api.sendMessage(id, `You don't have enough coins to buy ${item}`, {color: "red"});
+}
 }
 function generateIsland(id) {
     let nDN =
@@ -54,6 +65,7 @@ api.sendMessage(id,"There was an error generating your island. Please use !reset
   ]);
 }
 function onPlayerJoin(id) {
+
   if (api.getMoonstoneChestItemSlot(id, 0) == null) {
     api.setMoonstoneChestItemSlot(id, 0, "Gold Coin", 1, {
       customDisplayName: "100",
@@ -65,6 +77,7 @@ function onPlayerJoin(id) {
         " to this skyblock server! I see you're new here. To get started, first use the bone meal on the sapling, chop down the tree to collect some essential resources. Remember to regrow your tree! Next, in your hotbar, you should see a Water Bucket, and a Lava Bucket. Use them to create a messy stone generator by placing the water and lava in a 3x1x1 area. The liquids should be at opposite sides. Dont lose your lava to obsidian! Once you have some cobblestone, you can sell it, and start expanding your island. Good luck and have fun! \n Use !help to view all avaliable commands.",
       {}
     );
+    api.setClientOptions(id, {RightInfoText:styTxt(`<w bold><s 20px>✨SkyBloxd🌎🌳\n <w><s><c gray><i wrench><c> Owner - BloxdMasterYT_LT5 \n <c yellow><i coins><c> Coins - $100`)});
     generateIsland(id);
     api.sendMessage(
       id,
@@ -73,7 +86,9 @@ function onPlayerJoin(id) {
     return true;
   } else {
     api.sendMessage(id, "Welcome back " + api.getEntityName(id) + "! \n Use !help to see all avaliable commands", {});
+     api.setClientOptions(id, {RightInfoText:styTxt(`<w bold><s 20px>✨SkyBloxd🌎🌳\n <w><s><c gray><i wrench><c> Owner - BloxdMasterYT_LT5 \n <c yellow><i coins><c> Coins - $${api.getMoonstoneChestItemSlot(id, 0).attributes.customDisplayName}`)});
   }
+ 
 }
 var resetConfirm = false;
 var nDN;
@@ -82,7 +97,7 @@ function onPlayerChat(id, message) {
     if (message == "!help") {
       api.sendMessage(
         id,
-        "Here are some commands you can use:\n!resetEverything - Reset your island\n!help - Show this help message",
+        "Here are some commands you can use:\n!island - Go to your island \n!resetEverything - Reset your island\n!help - Show this help message",
         {}
       );
     }
@@ -109,7 +124,7 @@ function onPlayerChat(id, message) {
     }
     if(message == "!island"){
       api.sendMessage(id,"Teleporting...",{});
-      api.setPosition(id, [-346, 3, -431]);
+      api.setPosition(id, [-346.5, 2, -431.5]);
     }
     if (api.getEntityName(id) == "BloxdMasterYT_LT5") {
       if (message == "!help") {
