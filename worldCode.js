@@ -500,6 +500,7 @@ api.setBlock(x,y,z,)
 }else if(blocks['Coal Ore']>chances){
 api.setBlock(x,y,z,)
 }
+}
 onPlayerChangeBlock = (
   id,
   x,
