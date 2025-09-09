@@ -374,9 +374,12 @@ function onPlayerChat(id, message) {
     if (message == "!help") {
       api.sendMessage(
         id,
-        "Here are some commands you can use:\n!island - Go to your island \n!resetEverything - Reset your island\n!sellables - Show sellable items\n!help - Show this help message",
+        "Here are some commands you can use:\n!island - Go to your island \n!resetEverything - Reset your island\n!sellables - Show sellable items\n!help - Show this help message \n!xp - Show Levels and XP",
         {}
       );
+    }
+    if(message == '!xp'){
+      api.sendMessage(id,`You are level ${api.getMoonstoneChestItemSlot(id,2).attributes.customDisplayName} with ${api.getMoonstoneChestItemSlot(id,3).attributes.customDisplayName} / ${100*api.getMoonstoneChestItemSlot(id,2).attributes.customDisplayName} XP`,{})
     }
     if (message == "!resetEverything") {
       api.setPosition(id, [-346, 7, -433]);
@@ -485,19 +488,21 @@ function levelUp(id) {
 function mSBR(id,x,y,z){
    let currentLvl = api.getMoonstoneChestItemSlot(id, 2).attributes
     .customDisplayName;
-    let block;
+  
     let chances =Math.round(Math.random()*currentLvl)
     let blocks = {'Messy Stone':0.8*currentLvl,'Coal Ore':0.1*currentLvl,'Iron Ore':0.05*currentLvl,'Gold Ore':0.03*currentLvl,'Diamond Ore':0.015*currentLvl,'Moonstone Ore':0.005*currentLvl}
 if(blocks['Moonstone Ore']>chances){
-  block = 'Moonstone Ore';
+  api.setBlock(x,y,z,'Moonstone Ore')
 }else if(blocks['Diamond Ore']>chances){
-api.setBlock(x,y,z,)
+api.setBlock(x,y,z,'Diamond Ore')
 }else if(blocks['Gold Ore']>chances){
-api.setBlock(x,y,z,)
+api.setBlock(x,y,z,'Gold Ore')
 }else if(blocks['Iron Ore']>chances){
-api.setBlock(x,y,z,)
+api.setBlock(x,y,z,'Iron Ore')
 }else if(blocks['Coal Ore']>chances){
-api.setBlock(x,y,z,)
+api.setBlock(x,y,z,'Coal Ore')
+}else if(blocks['Messy Stone']>chances){
+api.setBlock(x,y,z,'Messy Stone')
 }
 }
 onPlayerChangeBlock = (
