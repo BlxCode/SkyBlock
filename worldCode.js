@@ -139,7 +139,6 @@ var valuableItems = {
   Rice: 25,
   Fat_Cactus: 300,
   Dry_Fat_Cactus: 250,
-  Water: 2,
   Cranberries: 55,
   Corn: 60,
   Cotton: 65,
@@ -212,7 +211,7 @@ function updateUi(id) {
         api.getMoonstoneChestItemSlot(id, 0).attributes.customDisplayName
       }\n <i award> Level - ${
         api.getMoonstoneChestItemSlot(id, 2).attributes.customDisplayName
-      }`
+      } \n <s 10px>v1.00`
     ),
   });
   api.setTargetedPlayerSettingForEveryone(
