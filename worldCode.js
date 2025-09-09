@@ -110,33 +110,126 @@ function styTxt(l) {
   return r;
 } /* Props to _frostycaveman (discord) for making setTickTimeout and customized custom text styling!*/
 var valuableItems = {
-  Gold_Antlers:5000,
-  Messy_Stone:20,
-  Maple_Log:100,
-  Apple:120,
-  Raw_Porkchop:250,
-  Cooked_Porkchop:350,
-  Raw_Beef:300,
-  Cooked_Beef:400,
-  Raw_Mutton:350,
-  Cooked_Mutton:450,
-  Leather:500,
-  Raw_Venison:400,
-  Cooked_Venison:500,
-  Fur:550,
-  Knight_Heart:1000,
-  Bone_Antlers:600,
-  Rice:25,
-  Fat_Cactus:300,
-  Dry_Fat_Cactus:250,
-  Water:2
+  Gold_Antlers: 5500,
+  Messy_Stone: 20,
+  Gold_Watermelon_Slice: 300,
+  Gold_Fragment: 200,
+  Coal: 245,
+  Raw_Iron: 650,
+  Iron_Bar: 750,
+  Gold_Bar: 1225,
+  Raw_Gold: 1125,
+  Diamond: 1350,
+  Moonstone: 2300,
+  Maple_Log: 100,
+  Apple: 120,
+  Raw_Porkchop: 250,
+  Cooked_Porkchop: 350,
+  Golem_Eye: 450,
+  Raw_Beef: 300,
+  Cooked_Beef: 400,
+  Raw_Mutton: 350,
+  Cooked_Mutton: 450,
+  Leather: 500,
+  Raw_Venison: 400,
+  Cooked_Venison: 500,
+  Fur: 550,
+  Knight_Heart: 1000,
+  Bone_Antlers: 600,
+  Rice: 25,
+  Fat_Cactus: 300,
+  Dry_Fat_Cactus: 250,
+  Water: 2,
+  Cranberries: 55,
+  Corn: 60,
+  Cotton: 65,
+  Chili_Pepper: 70,
+  Wheat: 50,
+  Watermelon: 65,
+  Watermelon_Slice: 13,
+  Melon: 75,
+  Melon_Slice: 15,
+  Pumpkin: 71,
+};
+function onInventoryUpdated(id) {
+  updateUi(id);
 }
-
 function actuallyGeneratingTheIsland(nDN, nDN2) {
   api.setBlockRect([nDN, -150, 429], [nDN2, -150, 424], "Bedrock");
   api.setBlockRect([nDN, -149, 429], [nDN2, -147, 424], "Dirt");
   api.setBlockRect([nDN, -146, 429], [nDN2, -146, 424], "Grass Block");
   api.setBlockRect([nDN - 3, -150, 426], [nDN2, -146, 424], "Air");
+}
+function sell(id, mode) {
+  let coins = Number(
+    api.getMoonstoneChestItemSlot(id, 0).attributes.customDisplayName
+  );
+  let heldItem = api.getHeldItem(id);
+  if (!heldItem) {
+    api.sendMessage(id, "You're not holding anything!", {
+      color: "red",
+    });
+    return;
+  }
+  let itemName = heldItem.name.replace(" ", "_");
+  if (!valuableItems[itemName]) {
+    api.sendMessage(id, "This item cannot be sold.", { color: "red" });
+    return;
+  }
+  if (mode === "sell1Same") {
+    api.setMoonstoneChestItemSlot(id, 0, "Gold Coin", 1, {
+      customDisplayName: String(coins + valuableItems[itemName]),
+    });
+    api.playSound(id, "cashRegister", 1, 1, undefined);
+    let slotIndex = api.getSelectedInventorySlotI(id);
+    let slotItem = api.getItemSlot(id, slotIndex);
+    api.removeItemName(id, heldItem.name, 1);
+    api.sendMessage(
+      id,
+      `You sold 1 ${itemName} for $${valuableItems[itemName]} Note: The sold item can be from anywhere in your inventory.`,
+      { color: "green" }
+    );
+  } else if (mode === "sellAllSame") {
+    let slotIndex = api.getSelectedInventorySlotI(id);
+    let slotItem = api.getItemSlot(id, slotIndex);
+    let totalValue = valuableItems[itemName] * slotItem.amount;
+    api.setMoonstoneChestItemSlot(id, 0, "Gold Coin", 1, {
+      customDisplayName: String(coins + totalValue),
+    });
+    api.sendMessage(
+      id,
+      `You sold all ${itemName}(s) for $${totalValue} Note: The sold item can be from anywhere in your inventory.`,
+      { color: "green" }
+    );
+    api.setItemSlot(id, slotIndex, "Air", 0, {}, true);
+  }
+  updateUi(id);
+}
+function updateUi(id) {
+  api.setClientOptions(id, {
+    RightInfoText: styTxt(
+      `<w bold><s 20px>✨SkyBloxd🌎🌳\n <w><s><c gray><i wrench><c> Owner - BloxdMasterYT_LT5 \n <c yellow><i coins><c> Coins - $${
+        api.getMoonstoneChestItemSlot(id, 0).attributes.customDisplayName
+      }\n <i award> Level - ${
+        api.getMoonstoneChestItemSlot(id, 2).attributes.customDisplayName
+      }`
+    ),
+  });
+  api.setTargetedPlayerSettingForEveryone(
+    id,
+    "nameTagInfo",
+    {
+      subtitle: [
+        {
+          str:
+            "$" +
+            api.getMoonstoneChestItemSlot(id, 0).attributes.customDisplayName,
+        },
+      ],
+      subtitleBackgroundColor: "#4BE74F",
+    },
+    true
+  );
 }
 function shop(id, item, price) {
   let coins = Number(
@@ -149,22 +242,7 @@ function shop(id, item, price) {
     });
     api.giveItem(id, item);
     api.sendMessage(id, `You bought ${item} for $${price}`, { color: "green" });
-    api.setClientOptions(id, {
-      RightInfoText: styTxt(
-        `<w bold><s 20px>✨SkyBloxd🌎🌳\n <w><s><c gray><i wrench><c> Owner - BloxdMasterYT_LT5 \n <c yellow><i coins><c> Coins - $${
-          api.getMoonstoneChestItemSlot(id, 0).attributes.customDisplayName
-        }`
-      ),
-    });
-    api.setTargetedPlayerSettingForEveryone(
-      id,
-      "nameTagInfo",
-      {
-        subtitle: [{ str: "$"+ api.getMoonstoneChestItemSlot(id, 0).attributes.customDisplayName }],
-        subtitleBackgroundColor: "#4BE74F",
-      },
-      true
-    );
+    updateUi(id);
   } else {
     api.playSound(id, "beep", 1, 1, undefined);
     api.sendMessage(id, `ur too broke lol 💀`, {
@@ -192,22 +270,7 @@ function gamble(id, price, min, max) {
     api.setMoonstoneChestItemSlot(id, 0, "Gold Coin", 1, {
       customDisplayName: String(coins - price + result),
     });
-    api.setClientOptions(id, {
-      RightInfoText: styTxt(
-        `<w bold><s 20px>✨SkyBloxd🌎🌳\n <w><s><c gray><i wrench><c> Owner - BloxdMasterYT_LT5 \n <c yellow><i coins><c> Coins - $${
-          api.getMoonstoneChestItemSlot(id, 0).attributes.customDisplayName
-        }`
-      ),
-    });
-    api.setTargetedPlayerSettingForEveryone(
-      id,
-      "nameTagInfo",
-      {
-        subtitle: [{ str: "$"+ api.getMoonstoneChestItemSlot(id, 0).attributes.customDisplayName }],
-        subtitleBackgroundColor: "#4BE74F",
-      },
-      true
-    );
+    updateUi(id);
   } else {
     api.playSound(id, "beep", 1, 1, undefined);
     api.sendMessage(id, `ur too broke lol 💀`, {
@@ -223,8 +286,7 @@ function generateIsland(id) {
     ) + 512;
   let nDN2 = nDN - 5;
   let awoefhd = String(nDN - 1);
-  //le.log(awoefhd);
-  //le.log(nDN2);
+
   api.setMoonstoneChestItemSlot(id, 1, "Dirt", 1, {
     customDisplayName: awoefhd,
   });
@@ -239,8 +301,6 @@ function generateIsland(id) {
   api.giveItem(id, "Bone Meal");
   api.giveItem(id, "Protector");
   api.giveItem(id, "Maple Sapling");
-  //le.log(nDN);
-  //le.log(api.getMoonstoneChestItemSlot(id, 1));
   try {
     setTickTimeout(() => {
       actuallyGeneratingTheIsland(nDN, nDN2);
@@ -275,6 +335,12 @@ function generateIsland(id) {
 function onPlayerJoin(id) {
   if (api.getMoonstoneChestItemSlot(id, 0) == null) {
     api.setPosition(id, -346.5, 8, -433.5);
+    api.setMoonstoneChestItemSlot(id, 2, "Messy Stone", 1, {
+      customDisplayName: "1",
+    });
+    api.setMoonstoneChestItemSlot(id, 3, "Messy Stone", 1, {
+      customDisplayName: "1",
+    });
     api.setMoonstoneChestItemSlot(id, 0, "Gold Coin", 1, {
       customDisplayName: "100",
     });
@@ -282,29 +348,14 @@ function onPlayerJoin(id) {
       id,
       "Welcome " +
         api.getEntityName(id) +
-        " to this skyblock server! I see you're new here. To get started, first use the bone meal on the sapling, chop down the tree to collect some essential resources. Remember to regrow your tree! Next, in your hotbar, you should see a Water Bucket, and a Lava Bucket. Use them to create a messy stone generator by placing the water and lava in a 3x1x1 area. The liquids should be at opposite sides. Dont lose your lava to obsidian! Once you have some cobblestone, you can sell it, and start expanding your island. Good luck and have fun! \n Use !help to view all avaliable commands.",
+        " to this skyblock server! \n Use !help to view all avaliable commands.",
       {}
     );
-    api.setClientOptions(id, {
-      RightInfoText: styTxt(
-        `<w bold><s 20px>✨SkyBloxd🌎🌳\n <w><s><c gray><i wrench><c> Owner - BloxdMasterYT_LT5 \n <c yellow><i coins><c> Coins - $100`
-      ),
-    });
-    api.setTargetedPlayerSettingForEveryone(
-      id,
-      "nameTagInfo",
-      {
-        subtitle: [{ str: "$100" }],
-        subtitleBackgroundColor: "#4BE74F",
-      },
-      true
-    );
+    updateUi(id);
+    setTickTimeout(() => {
+      generateIsland(id);
+    }, 100);
 
-    generateIsland(id);
-    api.sendMessage(
-      id,
-      "If you are falling to your death and you see an error, use !resetEverything to reset your island and hopefully fix the issue. If you are on a skyblock island please ignore this message."
-    );
     return true;
   } else {
     api.sendMessage(
@@ -314,24 +365,7 @@ function onPlayerJoin(id) {
         "! \n Use !help to see all avaliable commands",
       {}
     );
-
-    api.setTargetedPlayerSettingForEveryone(
-      id,
-      "nameTagInfo",
-      {
-        subtitle: [{ str: "$" + api.getMoonstoneChestItemSlot(id, 0).attributes.customDisplayName }],
-        subtitleBackgroundColor: "#4BE74F",
-      },
-      true
-    );
-
-    api.setClientOptions(id, {
-      RightInfoText: styTxt(
-        `<w bold><s 20px>✨SkyBloxd🌎🌳\n <w><s><c gray><i wrench><c> Owner - BloxdMasterYT_LT5 \n <c yellow><i coins><c> Coins - $${
-          api.getMoonstoneChestItemSlot(id, 0).attributes.customDisplayName
-        }`
-      ),
-    });
+    updateUi(id);
   }
 }
 var resetConfirm = false;
@@ -341,7 +375,7 @@ function onPlayerChat(id, message) {
     if (message == "!help") {
       api.sendMessage(
         id,
-        "Here are some commands you can use:\n!island - Go to your island \n!resetEverything - Reset your island\n!help - Show this help message",
+        "Here are some commands you can use:\n!island - Go to your island \n!resetEverything - Reset your island\n!sellables - Show sellable items\n!help - Show this help message",
         {}
       );
     }
@@ -350,6 +384,17 @@ function onPlayerChat(id, message) {
       api.sendMessage(
         id,
         "Are you sure you want to reset everything? !y/!n",
+        {}
+      );
+      resetConfirm = true;
+    }
+    if (message == "!sellables") {
+      api.sendMessage(
+        id,
+        "Here are the items you can sell:\n" +
+          Object.keys(valuableItems)
+            .map((item) => `${item}: $${valuableItems[item]}`)
+            .join("\n"),
         {}
       );
       resetConfirm = true;
@@ -411,16 +456,60 @@ function onBlockStand(id, blockX, blockY, blockZ, blockName) {
     api.setPosition(id, [1000.5, -450, 1000.5]);
   }
 }
+function levelUp(id) {
+  let currentLvl = api.getMoonstoneChestItemSlot(id, 2).attributes
+    .customDisplayName;
+  let currentXp = Number(
+    api.getMoonstoneChestItemSlot(id, 3).attributes.customDisplayName
+  );
+  let newXp = currentXp + 1;
+  if (currentXp == 100 * currentLvl) {
+    api.setMoonstoneChestItemSlot(id, 2, "Messy Stone", 1, {
+      customDisplayName: String(Number(currentLvl + 1)),
+    });
+    api.setMoonstoneChestItemSlot(id, 3, "Messy Stone", 1, {
+      customDisplayName: "0",
+    });
+    api.sendMessage(
+      id,
+      "You leveled up to level " + Number(String(currentLvl + 1)) + "!",
+      { color: "green" }
+      
+    );
+    updateUi(id);
+    return;
+  }
+  api.setMoonstoneChestItemSlot(id, 3, "Messy Stone", 1, {
+    customDisplayName: String(newXp),
+  });
+}
+function mSBR(id,x,y,z){
+   let currentLvl = api.getMoonstoneChestItemSlot(id, 2).attributes
+    .customDisplayName;
+    let block;
+    let chances =Math.round(Math.random()*currentLvl)
+    let blocks = {'Messy Stone':0.8*currentLvl,'Coal Ore':0.1*currentLvl,'Iron Ore':0.05*currentLvl,'Gold Ore':0.03*currentLvl,'Diamond Ore':0.015*currentLvl,'Moonstone Ore':0.005*currentLvl}
+if(blocks['Moonstone Ore']>chances){
+  block = 'Moonstone Ore';
+}else if(blocks['Diamond Ore']>chances){
+api.setBlock(x,y,z,)
+}else if(blocks['Gold Ore']>chances){
+api.setBlock(x,y,z,)
+}else if(blocks['Iron Ore']>chances){
+api.setBlock(x,y,z,)
+}else if(blocks['Coal Ore']>chances){
+api.setBlock(x,y,z,)
+}
 onPlayerChangeBlock = (
-  playerId,
+  id,
   x,
   y,
   z,
-  fromBlock,
+  a,
   toBlock,
-  droppedItem,
-  fromBlockInfo,
-  toBlockInfo
+  e,
+  i,
+  o
 ) => {
   if (
     toBlock == "Lava" &&
@@ -483,28 +572,32 @@ onPlayerChangeBlock = (
     api.getBlock(x - 1, y, z) == "Lava" &&
     api.getBlock(x + 1, y, z) == "Water"
   ) {
-    api.setBlock(x, y, z, "Messy Stone");
+    mSBR(id,x,y,z);
+    levelUp(id);
   }
   if (
     toBlock == "Air" &&
     api.getBlock(x + 1, y, z) == "Lava" &&
     api.getBlock(x - 1, y, z) == "Water"
   ) {
-    api.setBlock(x, y, z, "Messy Stone");
+   mSBR(id,x,y,z);
+    levelUp(id);
   }
   if (
     toBlock == "Air" &&
     api.getBlock(x, y, z + 1) == "Lava" &&
     api.getBlock(x, y, z - 1) == "Water"
   ) {
-    api.setBlock(x, y, z, "Messy Stone");
+    levelUp(id);
+    mSBR(id,x,y,z);
   }
   if (
     toBlock == "Air" &&
     api.getBlock(x, y, z - 1) == "Lava" &&
     api.getBlock(x, y, z + 1) == "Water"
   ) {
-    api.setBlock(x, y, z, "Messy Stone");
+    mSBR(id,x,y,z);
+    levelUp(id);
   }
 };
 onWorldSpawnMob = (mobId, mobType, x, y, z, mobHerdId, playSoundOnSpawn) => {
@@ -513,10 +606,10 @@ onWorldSpawnMob = (mobId, mobType, x, y, z, mobHerdId, playSoundOnSpawn) => {
   api.setMobSetting(mobId, "walkingSpeedMultiplier", 0);
   api.setMobSetting(mobId, "runningSpeedMultiplier", 0);
   api.setMobSetting(mobId, "jumpMultiplier", 0);
-  api.setMobSetting(mobId, "attackInterval", 1e+9);
+  api.setMobSetting(mobId, "attackInterval", 1e9);
   api.setMobSetting(mobId, "attackDamage", 0);
   api.setMobSetting(mobId, "hostilityRadius", 0);
   api.setMobSetting(mobId, "attackImpulse", 0);
-  api.setMobSetting(mobId,"secondaryAttackImpulse",0);
-  api.setMobSetting(mobId,"secondaryAttackDamage",0)
+  api.setMobSetting(mobId, "secondaryAttackImpulse", 0);
+  api.setMobSetting(mobId, "secondaryAttackDamage", 0);
 };
