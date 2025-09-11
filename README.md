@@ -55,7 +55,7 @@ Welcome Messages – New and returning players get unique messages.
 
 Tick System (setTickTimeout, setTickInterval, tick) – Custom timer implementation for delayed/repeated events. (Made By _frostycaveman (discord))
 
-Styling System (styTxt) – Parses inline tags (<c>, <w>, <s>, <i>) for styled in-game text. (Made By _frostycaveman (discord))
+Styling System (styTxt) – Parses inline tags for styled in-game text. (Made By _frostycaveman (discord))
 
 Event Hooks – Responds to onPlayerJoin, onPlayerChat, onInventoryUpdated, onBlockStand, onPlayerChangeBlock, and onWorldSpawnMob.
 
