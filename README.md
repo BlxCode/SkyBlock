@@ -74,3 +74,5 @@ Owner Username is set as BloxdMasterYT_LT5. Change it in the code if you want a 
 This code was minified for performance — a formatted version is recommended if you plan to extend it.
 
 All console logs and comments were removed in this build.
+
+Only paste in the obfusicated version because the unobfusicated version is too big for bloxd
