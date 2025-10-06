@@ -1,5 +1,7 @@
 TTimers = {};
+var tips = ["You can deposit coins into your bank by holding a gold coin that has a name of the amount you want to deposit and clicking.", "You can withdraw coins from your bank by using !withdraw (amount).", "You can sell items by going into the \"Sell Warp\".", "You can level up by mining a stone generator.", "You can go to your island faster by using the command \"!island\".", "If your messy stone generator isn't working, just replace the water / lava.","You can make your stone generator by placing water, and lava 1 block apart and breaking the block in between them.","If there are any bugs, please report them to BloxdMasterYT_LT5 on discord."];
 {
+  var lastTime = Math.floor(Date.now()/100000);
   const k = (c) => api.broadcastMessage(c, { color: "#ff9d87" }),
     s = TTimers;
   let m = 1,
@@ -42,6 +44,13 @@ TTimers = {};
       return (s[e][4] = i), e;
     }),
     (tick = (c, i) => {
+      if(lastTime!=Math.floor(Date.now()/100000)){
+        lastTime=Math.floor(Date.now()/100000);
+      api.broadcastMessage(
+        "Tip: "+tips[Math.floor(Math.random() * tips.length)],
+        { color: "#af3c23ff" }
+      );
+      }
       if (i || ++l >= o) {
         a = !1;
         let e = 1 / 0,
@@ -149,8 +158,24 @@ var valuableItems = {
   Melon: 75,
   Melon_Slice: 15,
   Pumpkin: 71,
+  Grass:5,
+  Dirt:2,
+  Maple_Log:40,
+  Maple_Wood_Planks:8,
 };
+function onPlayerPickedUpItem(id,name,amt){
+if(Object.keys(valuableItems).includes(name.replaceAll(" ","_"))){
+  for (let i = 0; i < 47; i++) {
+     let item = api.getItemSlot(id, i);
+       if (!item) continue;
+     if (item&&item.name == name&&Object.keys(valuableItems).includes(item.name.replaceAll(" ","_"))) {
 
+      api.setItemSlot(id, i, item.name, item.amount, {customDescription: "Sellable"}, true);
+        break;
+    }
+  }
+}
+}
 function onPlayerDamagingOtherPlayer(id, a, b, c, d, e) {
   if (
     !api.isInsideRect(
@@ -279,7 +304,7 @@ function updateUi(id) {
         api.getMoonstoneChestItemSlot(id, 2).attributes.customDisplayName
       } \n <s 10px>XP: ${
         api.getMoonstoneChestItemSlot(id, 3).attributes.customDisplayName
-      } / ${xpStuff}\n If your messy stone generator is not working, \n just replace the water / lava. \nv1.3`
+      } / ${xpStuff} \nv1.4`
     ),
   });
   api.setTargetedPlayerSettingForEveryone(
